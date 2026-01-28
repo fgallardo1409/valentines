@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Valentine Plan ✨</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Mali:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- ESTILOS GENERALES --- */
+        :root {
+            --bg-color: #f9f9f9;
+            --grid-color: #e5e5e5;
+            --accent: #B8B8FF; /* Lila suave */
+            --dark-accent: #7B68EE;
+            --text: #555;
+            --highlight: #FFD1DC;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Mali', cursive;
+            color: var(--text);
+            background-color: var(--bg-color);
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 25px 25px;
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #app-container {
+            background-color: rgba(255, 255, 255, 0.98);
+            width: 90%;
+            max-width: 420px;
+            min-height: 650px; /* Un poco más alto para que quepa la hora */
+            border-radius: 20px;
+            border: 4px solid var(--accent);
+            box-shadow: 10px 10px 0px rgba(184, 184, 255, 0.3);
+            padding: 25px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-family: 'Gaegu', cursive;
+            text-align: center;
+            color: var(--dark-accent);
+            font-size: 2em;
+            margin: 5px 0;
+            line-height: 1.1;
+        }
+
+        .korean-sub {
+            display: block;
+            font-size: 0.6em;
+            color: #999;
+            margin-top: 5px;
+            font-weight: normal;
+        }
+
+        /* --- BOTONES DE NAVEGACIÓN --- */
+        .nav-btn {
+            background-color: var(--dark-accent);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-family: 'Gaegu', cursive;
+            font-size: 1.3em;
+            cursor: pointer;
+            width: 100%;
+            margin-top: auto;
+            transition: opacity 0.2s;
+        }
+        .nav-btn:hover { opacity: 0.9; }
+        .nav-btn:disabled { background-color: #e0e0e0; cursor: not-allowed; opacity: 1; }
+
+        /* --- PANTALLAS --- */
+        .screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            flex-grow: 1;
+            animation: fadeIn 0.4s ease-out;
+        }
+        .screen.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- PANTALLA 1: PREGUNTA --- */
+        .intro-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover; /* Ajuste para que se vea bien */
+            object-position: center;
+            border-radius: 15px;
+            border: 2px dashed var(--accent);
+            margin: 20px 0;
+            background-color: #f0f0f0;
+        }
+
+        .yes-no-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            height: 60px;
+            position: relative;
+        }
+
+        .btn-choice {
+            padding: 10px 25px;
+            border-radius: 50px;
+            border: 2px solid var(--dark-accent);
+            background: white;
+            font-family: 'Gaegu', cursive;
+            font-size: 1.3em;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--dark-accent);
+        }
+        .btn-yes { background: var(--highlight); flex-grow: 1; }
+        .btn-no { background: #eee; border-color: #ccc; color: #999; position: relative; z-index: 100;}
+
+        /* --- CALENDARIO Y HORA --- */
+        .calendar-box {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            border: 2px solid var(--grid-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            margin-top: 10px;
+        }
+        .month-title {
+            text-align: center;
+            font-family: 'Gaegu', cursive;
+            font-size: 1.5em;
+            color: var(--dark-accent);
+            margin-bottom: 10px;
+        }
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 0.8em;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .day-item {
+            aspect-ratio: 1/1; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        .day-item:hover { background-color: #f0f0f0; }
+        .day-item.selected {
+            background-color: var(--dark-accent);
+            color: white;
+            font-weight: bold;
+            transform: scale(1.1);
+            box-shadow: 0 2px 5px rgba(123, 104, 238, 0.4);
+        }
+
+        /* Selector de Hora */
+        .time-container {
+            margin-top: 15px;
+            text-align: center;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            border: 2px solid var(--grid-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .time-label {
+            font-weight: bold;
+            color: var(--dark-accent);
+        }
+        .time-input {
+            border: 2px solid var(--highlight);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-family: 'Mali', cursive;
+            font-size: 1em;
+            color: var(--text);
+            outline: none;
+        }
+
+        /* --- SELECCIÓN DE IMÁGENES --- */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            overflow-y: auto;
+        }
+
+        .option-card {
+            background: white;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .option-card:hover { transform: translateY(-3px); }
+        .option-card.selected {
+            border-color: var(--dark-accent);
+            background-color: #f0f0ff;
+        }
+        .option-card.selected::after {
+            content: '✨';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 1.2em;
+        }
+
+        .option-img {
+            width: 100%;
+            height: 85px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            background-color: #f0f0f0;
+        }
+        .option-label { font-size: 0.9em; font-weight: bold; }
+
+        /* --- TICKET FINAL --- */
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border: 2px dashed var(--text);
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 19px, #eee 20px);
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+
+    <div id="screen-1" class="screen active">
+        <h1>Valentine's Day ✨<span class="korean-sub">밸런타인 데이</span></h1>
+        
+        <img src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUydmxiN280aDg4N25uOG03NTc4ODlmNm40NzdzYnFlbW10cXNjMHgzYSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/o0JqY89wfQUU/giphy.gif" class="intro-img" alt="Hello Kitty Intro">
+        
+        <p style="text-align: center; font-size: 1.2em;">¿Quieres ser mi San Valentín?<br><span style="font-size:0.8em; color:#999;">(Solo acepto un SÍ por respuesta)</span></p>
+
+        <div class="yes-no-container">
+            <button class="btn-choice btn-yes" onclick="nextScreen(2)">¡Sí!</button>
+            <button id="btn-no" class="btn-choice btn-no">No...</button>
+        </div>
+    </div>
+
+    <div id="screen-2" class="screen">
+        <h1>Elige día y hora 📅<span class="korean-sub">날짜와 시간</span></h1>
+        
+        <div class="calendar-box">
+            <div class="month-title">Febrero 2026 </div>
+            
+            <div class="weekdays">
+                <div>D</div><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div>
+            </div>
+            
+            <div class="days-grid">
+                <div class="day-item" onclick="selectDay(1, this)">1</div>
+                <div class="day-item" onclick="selectDay(2, this)">2</div>
+                <div class="day-item" onclick="selectDay(3, this)">3</div>
+                <div class="day-item" onclick="selectDay(4, this)">4</div>
+                <div class="day-item" onclick="selectDay(5, this)">5</div>
+                <div class="day-item" onclick="selectDay(6, this)">6</div>
+                <div class="day-item" onclick="selectDay(7, this)">7</div>
+                <div class="day-item" onclick="selectDay(8, this)">8</div>
+                <div class="day-item" onclick="selectDay(9, this)">9</div>
+                <div class="day-item" onclick="selectDay(10, this)">10</div>
+                <div class="day-item" onclick="selectDay(11, this)">11</div>
+                <div class="day-item" onclick="selectDay(12, this)">12</div>
+                
+                <div class="day-item" onclick="selectDay(13, this)">13</div>
+                <div class="day-item" onclick="selectDay(14, this)">14</div>
+                <div class="day-item" onclick="selectDay(15, this)">15</div>
+                
+                <div class="day-item" onclick="selectDay(16, this)">16</div>
+                <div class="day-item" onclick="selectDay(17, this)">17</div>
+                <div class="day-item" onclick="selectDay(18, this)">18</div>
+                <div class="day-item" onclick="selectDay(19, this)">19</div>
+                <div class="day-item" onclick="selectDay(20, this)">20</div>
+                <div class="day-item" onclick="selectDay(21, this)">21</div>
+                <div class="day-item" onclick="selectDay(22, this)">22</div>
+                <div class="day-item" onclick="selectDay(23, this)">23</div>
+                <div class="day-item" onclick="selectDay(24, this)">24</div>
+                <div class="day-item" onclick="selectDay(25, this)">25</div>
+                <div class="day-item" onclick="selectDay(26, this)">26</div>
+                <div class="day-item" onclick="selectDay(27, this)">27</div>
+                <div class="day-item" onclick="selectDay(28, this)">28</div>
+            </div>
+        </div>
+
+        <div class="time-container">
+            <span class="time-label">Hora:</span>
+            <input type="time" class="time-input" onchange="selectTime(this.value)">
+        </div>
+
+        <button class="nav-btn" onclick="nextScreen(3)" disabled id="btn-next-2">Siguiente 👉</button>
+    </div>
+
+    <div id="screen-3" class="screen">
+        <h1>¿Qué comemos? 🍱<span class="korean-sub">음식 메뉴</span></h1>
+        
+        <div class="options-grid">
+            <div class="option-card" onclick="selectOption('food', 'Sushi', this)">
+                <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400" class="option-img">
+                <div class="option-label">Sushi</div>
+            </div>
+            <div class="option-card" onclick="selectOption('food', 'Pizza', this)">
+                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400" class="option-img">
+                <div class="option-label">Pizza</div>
+            </div>
+            <div class="option-card" onclick="selectOption('food', 'Hamburguesas', this)">
+                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400" class="option-img">
+                <div class="option-label">Hamburguesas</div>
+            </div>
+            <div class="option-card" onclick="selectOption('food', 'Tacos', this)">
+                <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400" class="option-img">
+                <div class="option-label">Tacos</div>
+            </div>
+        </div>
+        <button class="nav-btn" onclick="nextScreen(4)" disabled id="btn-next-3">Siguiente 👉</button>
+    </div>
+
+    <div id="screen-4" class="screen">
+        <h1>¿Y de postre? 🍩<span class="korean-sub">디저트</span></h1>
+        
+        <div class="options-grid">
+            <div class="option-card" onclick="selectOption('dessert', 'Helado', this)">
+                <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400" class="option-img">
+                <div class="option-label">Helado</div>
+            </div>
+            <div class="option-card" onclick="selectOption('dessert', 'Donas', this)">
+                <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400" class="option-img">
+                <div class="option-label">Donas</div>
+            </div>
+            <div class="option-card" onclick="selectOption('dessert', 'Waffles', this)">
+                <img src="https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=400" class="option-img">
+                <div class="option-label">Waffles</div>
+            </div>
+            <div class="option-card" onclick="selectOption('dessert', 'Mochis', this)">
+                <img src="https://www.cocinadelirante.com/sites/default/files/images/2024/09/mochis-japoneses-receta.jpg" class="option-img">
+                <div class="option-label">Mochis</div>
+            </div>
+        </div>
+        <button class="nav-btn" onclick="nextScreen(5)" disabled id="btn-next-4">Siguiente 👉</button>
+    </div>
+
+    <div id="screen-5" class="screen">
+        <h1>Plan final <span class="korean-sub">데이트 코스</span></h1>
+        
+        <div class="options-grid">
+            <div class="option-card" onclick="selectOption('plan', 'Cine', this)">
+                <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400" class="option-img">
+                <div class="option-label">Cine</div>
+            </div>
+            <div class="option-card" onclick="selectOption('plan', 'Acuario', this)">
+                <img src="https://images.unsplash.com/photo-1524704654690-b56c05c78a00?w=400" class="option-img">
+                <div class="option-label">Acuario</div>
+            </div>
+            <div class="option-card" onclick="selectOption('plan', 'Museo', this)">
+                <img src="https://images.unsplash.com/photo-1566127444979-b3d2b654e3d7?w=400" class="option-img">
+                <div class="option-label">Museo</div>
+            </div>
+            <div class="option-card" onclick="selectOption('plan', 'Parque', this)">
+                <img src="https://images.adsttc.com/media/images/68b6/d718/f0a1/3200/01f3/5691/newsletter/Carol_Prado__5_.jpg?1756813169" class="option-img">
+                <div class="option-label">Parque</div>
+            </div>
+        </div>
+        <button class="nav-btn" onclick="showSummary()">¡Terminar! ✨</button>
+    </div>
+
+    <div id="screen-6" class="screen">
+        <h1>¡Todo listo! ✨<span class="korean-sub">준비 완료!</span></h1>
+        
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC8KLl3uebn2ZK1QkYk51YSvdn9137u2yHnQ&s" class="intro-img" style="height:150px; border:none;">
+        
+        <div class="summary-card">
+            <div style="text-align: center; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #555; padding-bottom:10px;">SALIDA DE VALENTINE'S</div>
+            
+            <div class="summary-item"><span>Día:</span> <span id="res-date">...</span></div>
+            <div class="summary-item"><span>Hora:</span> <span id="res-time">...</span></div>
+            
+            <div class="summary-item"><span>Comida:</span> <span id="res-food">...</span></div>
+            <div class="summary-item"><span>Postre:</span> <span id="res-dessert">...</span></div>
+            <div class="summary-item"><span>Plan:</span> <span id="res-plan">...</span></div>
+            
+            <div style="text-align: center; margin-top: 15px; font-size: 0.8em; color: #777;">Presentar este ticket el día de la salida 🐻</div>
+        </div>
+        
+        <p style="text-align: center; margin-top: 20px;">¡Mándame captura de pantalla! 📸</p>
+    </div>
+
+</div>
+
+<script>
+    // --- VARIABLES ---
+    let choices = { date: '', time: '', food: '', dessert: '', plan: '' };
+
+    // --- LOGICA BOTON NO ---
+    const noBtn = document.getElementById('btn-no');
+    let attempts = 0;
+
+    function moveButton() {
+        attempts++;
+        if (attempts >= 4) {
+            noBtn.innerText = "Ok ya entendí...  ";
+            return; 
+        }
+        const x = (Math.random() - 0.5) * 150;
+        const y = (Math.random() - 0.5) * 150;
+        noBtn.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    noBtn.addEventListener('mouseover', moveButton);
+    noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveButton(); });
+    noBtn.addEventListener('click', (e) => { 
+        if(attempts < 4) { e.preventDefault(); moveButton(); }
+        else { alert("¡Bueno, tú te lo pierdes! Pero dale al SÍ anda..."); }
+    });
+
+    // --- NAVEGACION ---
+    function nextScreen(screenNum) {
+        document.querySelector('.screen.active').classList.remove('active');
+        document.getElementById('screen-' + screenNum).classList.add('active');
+    }
+
+    // --- CALENDARIO Y HORA ---
+    function selectDay(day, element) {
+        choices.date = `${day} de Febrero`;
+        document.querySelectorAll('.day-item').forEach(d => d.classList.remove('selected'));
+        element.classList.add('selected');
+        checkDateScreen();
+    }
+
+    function selectTime(time) {
+        choices.time = time;
+        checkDateScreen();
+    }
+
+    function checkDateScreen() {
+        // Solo habilita el botón si hay fecha Y hora
+        if (choices.date && choices.time) {
+            const btn = document.getElementById('btn-next-2');
+            btn.disabled = false;
+            btn.innerText = "Siguiente ✨";
+        }
+    }
+
+    // --- SELECCION GENERAL ---
+    function selectOption(category, value, element) {
+        choices[category] = value;
+        const parentGrid = element.parentElement;
+        parentGrid.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+        element.classList.add('selected');
+
+        if(category === 'food') document.getElementById('btn-next-3').disabled = false;
+        if(category === 'dessert') document.getElementById('btn-next-4').disabled = false;
+    }
+
+    // --- RESUMEN ---
+    function showSummary() {
+        if(!choices.plan) { alert("¡Elige un plan porfi!"); return; }
+        
+        document.getElementById('res-date').innerText = choices.date;
+        document.getElementById('res-time').innerText = choices.time; // Mostrar hora
+        document.getElementById('res-food').innerText = choices.food;
+        document.getElementById('res-dessert').innerText = choices.dessert;
+        document.getElementById('res-plan').innerText = choices.plan;
+        
+        nextScreen(6);
+    }
+</script>
+
+</body>
+</html>
